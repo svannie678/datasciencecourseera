@@ -1,0 +1,45 @@
+---
+title: 'Part 1: Simulation Exercise'
+author: "Simone Van Taylor"
+date: "8/11/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##Question 1: Show the sample mean and compare it to the theoretical mean distribution
+
+```{r}
+set.seed(12345)
+n <- 40 
+lambda = .2
+sim <- 1000
+simmean <- NULL 
+for(i in 1:sim) {
+  simmean <- c(simmean, mean(rexp(n, lambda)))
+}
+mean(simmean) ##the simulation mean
+theomean <- mean(1/lambda) ##the theoretical mean
+theomean
+```
+
+the simulation mean is 4.97 and the theoretical mean is 5. 
+Therefore our sample is quite close to the theoretical mean and the CLT holds!
+
+Now lets plot it to show just how close they are!
+```{r}
+hist(simmean,breaks = n, prob = TRUE, xlab = "means", main = "sample mean versus theoretical mean")
+abline(v = theomean, pch =30, col = "green")
+abline(v = mean(simmean), pch = 30, col = "blue")
+```
+
+## Question 2: Show the sample is (via variance) and compare it to the theoretical variance of the distribtution
+```{r}
+var(simmean) ##samplevariance
+(lambda * sqrt(n))^-2 ##theoretical variance 
+```
+
+not large difference between the theoretical variance and the sample variance!
+

@@ -1,0 +1,73 @@
+---
+title: "Part2project"
+author: "Simone Van Taylor"
+date: "8/11/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Lets Load In and Explore the Data!!
+
+```{r echo = FALSE}
+library(ggplot2)
+library(magrittr)
+library(tidyverse)
+```
+
+
+```{r ToothGrowth}
+#load in data
+toothgrowth <- ToothGrowth
+#explore the data 
+head(toothgrowth)
+unique(toothgrowth$supp)
+unique(toothgrowth$dose)
+summary(toothgrowth)
+#whats the mean of the toothgrowth by supplement? 
+toothgrowth %>% 
+  group_by(supp) %>%
+  summarise(mean(len))
+
+##seems like its a little longer for OJ 
+
+##whats the mean by dose? 
+toothgrowth %>% 
+  group_by(dose) %>%
+  summarise(mean(len))
+```
+seems like the higher the dose the better 
+
+## Lets Visualize this Exploratory Analysis
+
+```{r}
+#lets visualize this: 
+toothgrowth %>%
+  ggplot(aes(x = as.factor(dose), y = len, fill = supp))+ 
+  geom_boxplot()+ 
+  labs(xlab = "dose", ylab = "length", title = "Tooth Length vs Dose by Delivery")
+```
+looks like theres a basic trend that as dose goes up length goes up. But is it significant? and is there an effect of supplement?
+
+##T Tests 
+```{r}
+t.test(len~supp, data = toothgrowth)
+```
+confidence interval crosses 0 and p is not less than .05 therefore we fail to reject the null hypothesis. Looks to be no significant difference between supplement type 
+
+
+```{r}
+toothgrowth_sub <- filter(ToothGrowth, ToothGrowth$dose == 1.0|ToothGrowth$dose == 0.5)
+t.test(len~dose,data=toothgrowth_sub)
+
+toothgrowth_sub <- filter(ToothGrowth, ToothGrowth$dose == 0.5|ToothGrowth$dose == 2.0)
+t.test(len~dose,data=toothgrowth_sub)
+
+toothgrowth_sub <- filter(ToothGrowth, ToothGrowth$dose == 1.0|ToothGrowth$dose == 2.0)
+t.test(len~dose,data=toothgrowth_sub)
+```
+for all t tests the confidence int did not pass through zero and p was less than .05 therefore we reject the null hypothesis and can conclude dose significantly effected tooth length

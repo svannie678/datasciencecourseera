@@ -1,0 +1,71 @@
+---
+title: "Regression Models Course Project"
+author: "Simone Van Taylor"
+date: "9/18/2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Executive Summary
+The purpose of this assignment is to explore the relationship between tranmission type (am) and miles per gallon (mpg) using exploratory analysis and regression. 
+
+The following analysis did find a sigificant relationship between mpg and am, even when controlling for other variables such as weight (wt) and acceleration (qsec). Specifically, manual tranmission added 2.93 miles per gallon. 
+
+Diagnostic analysis found this model to be fit fairly well (see details below).
+
+## Loading in Data and Exploratory Analysis
+```{r include= FALSE}
+library(ggplot2)
+library(magrittr)
+library(tidyverse)
+```
+
+```{r mtcars}
+head(mtcars)
+
+mtcars$am %<>% as.factor()
+levels(mtcars$am)=c("AT","MT")
+
+mtcars %>%
+  group_by(am) %>%
+  summarise(avgmpg = mean(mpg))
+
+mtcars %>%
+  ggplot(aes(am,mpg)) + 
+  geom_boxplot()
+```
+
+From the above exploratory analysis we can conclude that mpg is higher for cars with manual transmission compared to automatic. But how does a regression better explain this relationship? 
+
+##Regression
+```{r}
+fit1 <- lm(mpg ~ factor(am), data = mtcars)
+summary(fit1)
+```
+
+This first regression shows that manual transmission adds 7.245 increase to mpg. This is a significant relationship. However r^2 is .3385 showing that only 34% of the variance in mpg is accounted for with tranmission type. Can a different model explain the variance in mpg better? 
+
+```{r include = FALSE}
+fit2 <- step(lm(mpg~.,mtcars))
+```
+
+```{r}
+summary(fit2)
+```
+Because we don't have a theoretical reason for other variables that may impact mpg, we ran a stepwise regression, which systematically interates, to give us a regression using variables that account for the most variance.
+
+From this regression, we can see that weight and qsec also impact mpg. Taking these other varibles into account also change the estimate for am on mpg, however the effect is still significant. Holding the other variables constant, manual tranmission increases the mpg by 2.93 miles. 
+
+##Diagnostic Analysis
+Overall, the residual plots (in the appendix) show us that the model is fit fairly well to the data. The residuals versus fitted graph is distributed normally,the q-q plot falls along the line and the residuals versus location doesn't violate cooks distance.However, the scale-location graph increases linearily which shows us that there may not be equal variance.
+
+##Appendix
+```{r}
+par(mfrow = c(2,2))
+plot(fit2)
+```
